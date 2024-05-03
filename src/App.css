@@ -1,5 +1,5 @@
 /* Importing Rubik font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap");
 
 /* Resetting default styles and setting global styles */
 * {
@@ -9,9 +9,8 @@
   font-family: "Rubik", sans-serif;
   text-align: left;
 }
-.container-full:has(.overlay) #root{
+.container-full:has(.overlay) #root {
   background-color: rgb(27, 27, 27);
-
 }
 
 /* Styles for the container */
@@ -20,7 +19,7 @@
   width: 1170px;
   margin: 0 auto;
   padding: 2rem;
- 
+
   /* Styles for the main title */
   .main-title {
     margin-bottom: 10px;
@@ -67,12 +66,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      
     }
   }
 
   /* Media queries */
-  @media(max-width:1200px) {
+  @media (max-width: 1200px) {
     width: 100%;
     padding: 25px;
 
@@ -82,7 +80,7 @@
     } */
   }
 
-  @media(max-width:992px) {
+  @media (max-width: 992px) {
     /* Adjusting font size for main title */
     .main-title {
       font-size: 26px;
@@ -97,7 +95,7 @@
     }
   }
 
-  @media(max-width:768px) {
+  @media (max-width: 768px) {
     /* Adjusting padding for smaller screens */
     padding: 0 10px;
     /* Adjusting font size for main title */
@@ -114,7 +112,7 @@
     }
   }
 
-  @media(max-width:576px) {
+  @media (max-width: 576px) {
     /* Adjusting padding and flex direction for smaller screens */
     .action-box {
       padding: 15px;
@@ -237,14 +235,15 @@
   outline: none;
   background-color: #ffffff;
   color: #0d0c22;
-  transition: .3s ease;
+  transition: 0.3s ease;
 }
 
 .input::placeholder {
   color: #9e9ea7;
 }
 
-.input:focus, input:hover {
+.input:focus,
+input:hover {
   outline: none;
   border-color: #008260;
   background-color: #fff;
@@ -259,10 +258,9 @@
   height: 1rem;
 }
 
-
 .button {
-  width: 30px;
-  height: 30px;
+  min-width: 30px;
+  min-height: 30px;
   border-radius: 50%;
   background-color: rgb(20, 20, 20);
   border: none;
@@ -303,3 +301,12 @@
   transform: rotate(160deg);
 }
 
+.univeristy-iframe {
+  width: 100%;
+  height: 600px;
+}
+
+.domain{
+  color: grey;
+  margin-bottom: 50px;
+}

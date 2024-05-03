@@ -1,31 +1,40 @@
-// UniversityList.jsx
 import { useState, useEffect } from "react";
-import { fetchUniversities } from "./../../utilities/api";
-import Loader from "./Loader/Loader";
-import ActionBox from "./ActionBox";
-import Toast from "./Toast/Toast";
-import ModalDeleteConfirmation from "./DeleteModal/ModalDeleteConfirmation";
+import { Loader, ActionBox, Toast, DeleteModal, Header } from "./../components";
+import { useUniversites } from "./../hooks/useUniversites";
+import { NavLink } from "react-router-dom";
 
 const UniversityList = () => {
+  const { data, isFetched, dataUpdatedAt } = useUniversites();
   const [universities, setUniversities] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedUniversity, setSelectedUniversity] = useState(null); // Track selected university for deletion
   const [showModal, setShowModal] = useState(false); // State to control modal visibility
   const [showSuccessModal, setShowSuccessModal] = useState(false); // State to control success modal visibility
   const [sortByName, setSortByName] = useState(false); // State to track sorting by name
   const [searchQuery, setSearchQuery] = useState(""); // State to track search query
 
+  //to handle deleted items when API get fetched again
+  useEffect(() => {
+    let deletedList = localStorage.getItem("deletedList");
+    if (deletedList) {
+      deletedList = JSON.parse(deletedList);
+      const dataWithoutDeletedItems = data?.filter(
+        (u) => u?.name != deletedList
+      );
+      setUniversities(dataWithoutDeletedItems);
+    }
+  }, [dataUpdatedAt]);
+
   // Function to confirm deletion
   const confirmDelete = () => {
     // Remove selected university from the list
-    const updatedList = universities.filter(
-      (uni) => uni.name !== selectedUniversity.name
+    const updatedList = [...universities].filter(
+      (uni) => uni?.name !== selectedUniversity?.name
     );
     // Update state and local storage with updated list after deleting the university
     setUniversities(updatedList);
 
     // Updating the local storage with the new university list
-    localStorage.setItem("universities", JSON.stringify(updatedList));
+    localStorage?.setItem("deletedList", JSON.stringify(updatedList));
     // Hide the modal after deletion
     setShowModal(false);
 
@@ -35,39 +44,22 @@ const UniversityList = () => {
     setTimeout(() => setShowSuccessModal(false), 2000);
   };
 
-  // Function to fetch universities
-  const fetchData = async () => {
-    const data = await fetchUniversities();
-    setUniversities(data); // Updating state with fetched data
-    setIsLoading(false); // Setting loading state to false after data is fetched
-  };
-
-  useEffect(() => {
-    fetchData(); // Calling fetchData function when component mounts
-  }, []); // Empty dependency array ensures useEffect runs only once after component mounts
-
   // Function to handle sorting by name
   useEffect(() => {
     if (sortByName) {
       const sortedUniversities = [...universities].sort((a, b) =>
-        a.name.localeCompare(b.name)
+        a?.name?.localeCompare(b?.name)
       );
       setUniversities(sortedUniversities);
     } else {
-      // Reset universities to the original order when sorting is disabled
-      fetchData();
+      setUniversities(data);
     }
   }, [sortByName]); // Re-run effect when sortByName state changes
 
-  // Function to handle search
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
   return (
     <div className={showModal ? "container-full overlay" : "container-full"}>
-    
-      <ModalDeleteConfirmation
+      <Header />
+      <DeleteModal
         showModal={showModal}
         selectedUniversity={selectedUniversity}
         confirmDelete={confirmDelete}
@@ -78,22 +70,22 @@ const UniversityList = () => {
 
       <ActionBox
         searchQuery={searchQuery}
-        handleSearch={handleSearch}
+        handleSearch={(e) => setSearchQuery(e.target.value)}
         sortByName={sortByName}
         setSortByName={setSortByName}
       />
 
       <ul className="flex-list">
-        {isLoading ? (
-          <Loader />
-        ) : (
+        {isFetched ? (
           universities
             .filter((university) =>
               university.name.toLowerCase().includes(searchQuery.toLowerCase())
             )
             .map((university) => (
               <li className="list-item" key={university.name}>
-                <h4>{university.name}</h4>
+                <NavLink to={`/university-details/${university.name}`}>
+                  <h4>{university.name}</h4>
+                </NavLink>
 
                 <button
                   onClick={() => {
@@ -142,6 +134,8 @@ const UniversityList = () => {
                 </button>
               </li>
             ))
+        ) : (
+          <Loader />
         )}
       </ul>
     </div>

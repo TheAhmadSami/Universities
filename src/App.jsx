@@ -1,27 +1,21 @@
-
-
-
-import Header from './components/Header'
-import UniversityList from './components/UniversityList'
-
-import './App.css'
-
-// Import your components
-
+import { Route, Routes } from "react-router-dom";
+import { Header } from "./components";
+import { UniversityList, UniversityDetails } from "./screens";
+import "./App.css";
 
 function App() {
-
-
   return (
     <>
-
-    
-     <Header/>
-
-     <UniversityList />
-     
+      <Routes>
+        <Route key={"home"} path={"/"} element={<UniversityList />} />
+        <Route
+          key={"university-details"}
+          path={"/university-details/:id"}
+          element={<UniversityDetails />}
+        />
+      </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
