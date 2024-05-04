@@ -1,28 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Loader, ActionBox, Toast, DeleteModal, Header } from "./../components";
 import { useUniversites } from "./../hooks/useUniversites";
 import { NavLink } from "react-router-dom";
 
 const UniversityList = () => {
-  const { data, isFetched, dataUpdatedAt } = useUniversites();
-  const [universities, setUniversities] = useState([]);
+  const { data, dataUpdatedAt } = useUniversites();
+  const storageData = useMemo(() => {
+    const dataTmp = localStorage.getItem("universities");
+    if (dataTmp) {
+      return JSON.parse(dataTmp);
+    } else if (data?.length) {
+      localStorage.setItem("universities", JSON.stringify(data));
+      return data;
+    }
+  }, [dataUpdatedAt]);
+  const [universities, setUniversities] = useState(storageData);
   const [selectedUniversity, setSelectedUniversity] = useState(null); // Track selected university for deletion
   const [showModal, setShowModal] = useState(false); // State to control modal visibility
   const [showSuccessModal, setShowSuccessModal] = useState(false); // State to control success modal visibility
   const [sortByName, setSortByName] = useState(false); // State to track sorting by name
   const [searchQuery, setSearchQuery] = useState(""); // State to track search query
-
-  //to handle deleted items when API get fetched again
-  useEffect(() => {
-    let deletedList = localStorage.getItem("deletedList");
-    if (deletedList) {
-      deletedList = JSON.parse(deletedList);
-      const dataWithoutDeletedItems = data?.filter(
-        (u) => u?.name != deletedList
-      );
-      setUniversities(dataWithoutDeletedItems);
-    }
-  }, [dataUpdatedAt]);
 
   // Function to confirm deletion
   const confirmDelete = () => {
@@ -34,7 +31,7 @@ const UniversityList = () => {
     setUniversities(updatedList);
 
     // Updating the local storage with the new university list
-    localStorage?.setItem("deletedList", JSON.stringify(updatedList));
+    localStorage?.setItem("universities", JSON.stringify(updatedList));
     // Hide the modal after deletion
     setShowModal(false);
 
@@ -47,12 +44,12 @@ const UniversityList = () => {
   // Function to handle sorting by name
   useEffect(() => {
     if (sortByName) {
-      const sortedUniversities = [...universities].sort((a, b) =>
+      const sortedUniversities = [...storageData].sort((a, b) =>
         a?.name?.localeCompare(b?.name)
       );
       setUniversities(sortedUniversities);
     } else {
-      setUniversities(data);
+      setUniversities(storageData);
     }
   }, [sortByName]); // Re-run effect when sortByName state changes
 
@@ -76,12 +73,14 @@ const UniversityList = () => {
       />
 
       <ul className="flex-list">
-        {isFetched ? (
+        {universities?.length ? (
           universities
-            .filter((university) =>
-              university.name.toLowerCase().includes(searchQuery.toLowerCase())
+            ?.filter((university) =>
+              university?.name
+                ?.toLowerCase()
+                ?.includes(searchQuery?.toLowerCase())
             )
-            .map((university) => (
+            ?.map((university) => (
               <li className="list-item" key={university.name}>
                 <NavLink to={`/university-details/${university.name}`}>
                   <h4>{university.name}</h4>
